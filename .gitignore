@@ -1,0 +1,16 @@
+# Go build/test artifacts
+.gocache/
+*.test
+*.out
+coverage.out
+
+# Local binaries
+/testproxy
+
+# Packaged release artifacts
+/dist/
+
+# OS/editor metadata
+.DS_Store
+*.swp
+*.swo
