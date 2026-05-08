@@ -15,6 +15,27 @@ go build ./cmd/testproxy
 
 构建后会在当前目录生成 `testproxy` 二进制文件。
 
+## 发布
+
+项目包含 GitHub Actions 发布流程：向 GitHub 推送任意 tag 后，会自动编译 Linux、macOS、Windows 的 `amd64` 和 `arm64` 二进制文件，并发布到对应的 GitHub Release。
+
+示例：
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+Release 中会包含：
+
+- `testproxy_<tag>_linux_amd64.tar.gz`
+- `testproxy_<tag>_linux_arm64.tar.gz`
+- `testproxy_<tag>_darwin_amd64.tar.gz`
+- `testproxy_<tag>_darwin_arm64.tar.gz`
+- `testproxy_<tag>_windows_amd64.zip`
+- `testproxy_<tag>_windows_arm64.zip`
+- `checksums.txt`
+
 ## 代理 URL
 
 使用 `-x` 指定代理服务器 URL：
