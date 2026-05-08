@@ -10,12 +10,14 @@ permissions:
 
 jobs:
   release:
-    name: Build and publish release
+    name: GoReleaser
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -26,56 +28,11 @@ jobs:
       - name: Test
         run: go test ./...
 
-      - name: Build binaries
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          tag="${GITHUB_REF_NAME}"
-          mkdir -p dist
-
-          platforms=(
-            "linux amd64"
-            "linux arm64"
-            "darwin amd64"
-            "darwin arm64"
-            "windows amd64"
-            "windows arm64"
-          )
-
-          for platform in "${platforms[@]}"; do
-            read -r goos goarch <<< "${platform}"
-
-            package_name="testproxy_${tag}_${goos}_${goarch}"
-            package_dir="dist/${package_name}"
-            binary_name="testproxy"
-            if [ "${goos}" = "windows" ]; then
-              binary_name="testproxy.exe"
-            fi
-
-            mkdir -p "${package_dir}"
-            env CGO_ENABLED=0 GOOS="${goos}" GOARCH="${goarch}" \
-              go build -trimpath -ldflags="-s -w" \
-              -o "${package_dir}/${binary_name}" ./cmd/testproxy
-
-            cp README.md "${package_dir}/README.md"
-
-            if [ "${goos}" = "windows" ]; then
-              (cd dist && zip -qr "${package_name}.zip" "${package_name}")
-            else
-              tar -C dist -czf "dist/${package_name}.tar.gz" "${package_name}"
-            fi
-
-            rm -rf "${package_dir}"
-          done
-
-          (cd dist && sha256sum * > checksums.txt)
-
-      - name: Publish GitHub Release
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "${GITHUB_REF_NAME}" dist/* \
-            --verify-tag \
-            --title "${GITHUB_REF_NAME}" \
-            --generate-notes
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

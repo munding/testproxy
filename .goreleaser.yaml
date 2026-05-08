@@ -1,0 +1,42 @@
+version: 2
+
+project_name: testproxy
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: testproxy
+    main: ./cmd/testproxy
+    binary: testproxy
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+
+archives:
+  - id: testproxy
+    ids:
+      - testproxy
+    name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+  sort: asc

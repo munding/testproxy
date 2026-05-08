@@ -17,7 +17,7 @@ go build ./cmd/testproxy
 
 ## 发布
 
-项目包含 GitHub Actions 发布流程：向 GitHub 推送任意 tag 后，会自动编译 Linux、macOS、Windows 的 `amd64` 和 `arm64` 二进制文件，并发布到对应的 GitHub Release。
+项目使用 GoReleaser 和 GitHub Actions 发布：向 GitHub 推送任意 tag 后，会自动编译 Linux、macOS、Windows 的 `amd64` 和 `arm64` 二进制文件，并发布到对应的 GitHub Release。
 
 示例：
 
